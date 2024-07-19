@@ -18,15 +18,36 @@ export function ChatInterface() {
     setMessages([...messages, userMessage]);
 
     // Placeholder for sending message to backend and receiving response
-    const chatbotResponse = { id: Date.now() + 1, text: 'Chatbot response here', sender: 'chatbot' };
-    setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+    
+    const raw = JSON.stringify({
+        id: userMessage.id,
+        message: userMessage.text,
+    });
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+    };
+
+    fetch("http://127.0.0.1:8000/send-message", requestOptions)
+        .then((response) => response.json()) // Assuming the response is JSON
+        .then((result) => {
+            console.log(result);
+            // Assuming result contains the chatbot's response
+            const chatbotResponse = { id: Date.now() + 1, text: result.response, sender: 'chatbot' };
+            setMessages((prevMessages) => [...prevMessages, chatbotResponse]);
+        })
+        .catch((error) => console.error(error));
 
     setInput(''); // Clear input after sending
   };
 
   return (
     <div className="chat-container p-4 max-w-md mx-auto border rounded-lg shadow">
-      <div className="messages-area space-y-2 overflow-y-auto h-96 lg:w-96">
+      <div className="messages-area space-y-2 overflow-y-auto h-96 w-100 md:w-96">
         {messages.map((message) => (
           <div key={message.id} className={`message flex ${message.sender === 'user' ? 'justify-end mr-4' : 'justify-start'}`}>
             <div className={`rounded px-4 py-2 ${message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
