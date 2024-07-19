@@ -17,6 +17,6 @@ class Message(BaseModel):
     id: int
     message: str
 
-@app.post("/send-message")  # Use @app.post instead of @app.route
+@app.post("/send-message")
 def send_message(chat_message: Message):
     return {"response": "Chatbot response for message: " + chat_message.message}
